@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=61.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "caretaker-ai"
+version = "0.1.0"
+description = "Autonomous self-healing CLI for unmaintained software pipelines."
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+dependencies = [
+    "google-genai>=2.0.0"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0"
+]
+
+[project.scripts]
+caretaker = "caretaker_ai.cli:main"
+
+[tool.setuptools]
+packages = ["caretaker_ai"]
