@@ -107,4 +107,17 @@ caretaker-ai/
 │   ├── calculator.py  # A buggy application file
 │   └── test_calculator.py
 └── pyproject.toml     # Project configuration & dependencies
+
+---
+
+## 🔮 Future Vision: Continuous DevOps & GitHub Monitoring Agent
+
+Caretaker AI is designed to scale from a local CLI into a fully autonomous, continuous DevOps Agent. By monitoring GitHub repositories for issues and bug reports, Caretaker can autonomously:
+
+1. **Detect:** Listen to repository webhooks or poll the GitHub API for new issues labeled as bugs.
+2. **Reproduce:** Read the issue description and use Gemini to generate a dedicated pytest file (e.g. `test_bug.py`) that replicates the bug.
+3. **Heal:** Execute the self-healing loop locally until the generated reproduction test passes.
+4. **Verify & Deploy:** Commit the code modifications, push them to a temporary branch, and submit a Pull Request back to the main repository.
+
+The conceptual layout for this extension is outlined in [devops_agent.py](file:///c:/Users/danny/OneDrive/Desktop/my-first-project/caretaker-ai/caretaker_ai/devops_agent.py).
 ```
