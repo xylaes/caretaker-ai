@@ -1,9 +1,12 @@
 import argparse
 import sys
 import os
-from caretaker_ai.runner import CommandRunner
-from caretaker_ai.engine import GeminiHealer
-from caretaker_ai.patcher import Patcher
+from google.adk.runners import Runner
+from google.adk.sessions import InMemorySessionService
+from google.adk.agents.run_config import RunConfig, StreamingMode
+from google.genai import types
+
+from caretaker_ai.agent import root_agent
 
 def main():
     parser = argparse.ArgumentParser(
@@ -43,65 +46,54 @@ def main():
 
     args = parser.parse_args()
 
+    # Configure Google Cloud environment if parameters provided
+    if args.project_id:
+        os.environ["GOOGLE_CLOUD_PROJECT"] = args.project_id
+    if args.location:
+        os.environ["GOOGLE_CLOUD_LOCATION"] = args.location
+    if args.model:
+        os.environ["GOOGLE_GENAI_MODEL"] = args.model
+
     print("=== Caretaker AI Self-Healing Loop ===")
-    runner = CommandRunner(args.test_command)
-    
-    # 1. Run initial tests
-    success, output, code = runner.run()
-    if success:
-        print("[OK] All tests passed! Code is healthy. No healing needed.")
-        sys.exit(0)
-        
-    print(f"\n[!] Test/Build command failed (exit code: {code})")
-    print(f"Error logs:\n{output}\n")
-    
+    print(f"Target File: {args.target_file}")
+    print(f"Test Command: {args.test_command}")
+    print(f"Max Retries: {args.max_retries}")
+    print("--------------------------------------")
+
     # Check if target file exists
     if not os.path.exists(args.target_file):
         print(f"Error: Target file '{args.target_file}' does not exist.", file=sys.stderr)
         sys.exit(1)
-        
-    healer = GeminiHealer(
-        project_id=args.project_id,
-        location=args.location,
-        model_name=args.model
+
+    # Initialize the ADK Session and Runner
+    session_service = InMemorySessionService()
+    session = session_service.create_session_sync(user_id="cli_user", app_name="caretaker-ai")
+    runner = Runner(agent=root_agent, session_service=session_service, app_name="caretaker-ai")
+
+    query = f"Repair the file '{args.target_file}' using test command '{args.test_command}' with max retries {args.max_retries}"
+    message = types.Content(
+        role="user", parts=[types.Part.from_text(text=query)]
     )
-    
-    retries = 0
-    while not success and retries < args.max_retries:
-        retries += 1
-        print(f"\n--- Healing Attempt {retries}/{args.max_retries} ---")
-        
-        # Read file
-        with open(args.target_file, "r", encoding="utf-8") as f:
-            original_code = f.read()
-            
-        # Call Gemini
-        raw_response = healer.generate_fix(args.target_file, original_code, output)
-        corrected_code = Patcher.extract_code(raw_response)
-        
-        # Calculate proposed diff
-        diff = Patcher.generate_diff(original_code, corrected_code, args.target_file)
-        if not diff.strip():
-            print("Gemini proposed no changes. Exiting.")
-            sys.exit(1)
-            
-        print("\nProposed patch:")
-        print(diff)
-        
-        # Apply patch
-        print(f"Applying patch to '{args.target_file}'...")
-        Patcher.apply_patch(args.target_file, corrected_code)
-        
-        # Re-verify
-        success, output, code = runner.run()
-        if success:
-            print(f"\n[OK] SUCCESS: Self-healing succeeded on attempt {retries}! All tests pass.")
-            sys.exit(0)
-        else:
-            print(f"\n[!] Patch failed. Error logs:\n{output}\n")
-            
-    print("\n[FAIL] Caretaker failed to heal the application within the retry limit.")
-    sys.exit(1)
+
+    # Execute the self-healing loop
+    events = runner.run(
+        new_message=message,
+        user_id="cli_user",
+        session_id=session.id,
+        run_config=RunConfig(streaming_mode=StreamingMode.SSE),
+    )
+
+    for event in events:
+        if event.content and event.content.parts:
+            text = "".join(part.text for part in event.content.parts if part.text)
+            if text:
+                print(text, end="", flush=True)
+        elif event.output:
+            # Handle status outputs or tool executions
+            print(f"\n[Event] {event.output}")
+
+    print("\n--------------------------------------")
+    print("=== Caretaker AI self-healing loop finished ===")
 
 if __name__ == "__main__":
     main()
