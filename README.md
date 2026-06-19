@@ -1,32 +1,110 @@
-# Caretaker AI
+# Caretaker AI 🤖🔧
 
-Autonomous self-healing CLI tool for unmaintained and legacy software pipelines.
+Autonomous self-healing agent for unmaintained, legacy, and EOL software pipelines.
 
-## Overview
+Caretaker AI acts as a digital custodian for unmaintained software. It automatically intercepts test/build failures, analyzes the failure stack trace, queries a Gemini-powered Agent to generate targeted code patches, applies the corrections, and verifies that the pipeline is restored to a healthy state.
 
-Caretaker AI acts as an autonomous caretaker for software that is no longer seeing active developer support. It integrates directly into test or build pipelines to catch failures, analyze the failure stack traces, query a Large Language Model (Gemini) to generate targeted fixes, apply those patches, and verify that the build is restored to a healthy state.
+---
 
-## Installation
+## 🌟 Key Features
 
-Install in editable mode for development:
+- **Autonomous Healing Loop:** Detects, diagnoses, patches, and verifies code failures in an iterative loop.
+- **ADK 2.0 Architecture:** Built on the Google Agent Development Kit (ADK) using native agent tool-use capabilities.
+- **Robust Tooling:** Equips the agent with filesystem read/write permissions and shell command execution.
+- **Command Line & Agent Playground Support:** Run it as a standard developer CLI tool or load it into the Google Agent Playground for interactive visual debugging.
 
-```bash
-pip install -e .[dev]
+---
+
+## 🏗️ Architecture & Self-Healing Loop
+
+```mermaid
+graph TD
+    START([Start Caretaker]) --> RunTests[Tool: run_test_command]
+    RunTests --> Verify{Tests Pass?}
+    Verify -- Yes --> SUCCESS([Exit 0: Healthy])
+    Verify -- No --> CheckRetries{Attempts < Max?}
+    
+    CheckRetries -- No --> FAIL([Exit 1: Failed to Heal])
+    CheckRetries -- Yes --> ReadFile[Tool: read_source_file]
+    
+    ReadFile --> Agent[Gemini 2.5 Healer Agent]
+    Agent --> ApplyPatch[Tool: apply_patch]
+    ApplyPatch --> RunTests
 ```
 
-## Usage
+---
 
-Run the self-healing caretaker loop:
+## 🛠️ Agent Specifications (ADK 2.0)
+
+Caretaker AI is defined as an ADK `Agent` equipped with three custom tools:
+
+1. **`read_source_file`**: Reads the target source file that contains the bug.
+2. **`run_test_command`**: Executes the test suite or build command (e.g., `pytest`, `npm test`) and returns output/logs.
+3. **`apply_patch`**: Overwrites the target file with the corrected code.
+
+### System Instructions
+The agent is instructed to:
+- Read the code and run the failing test.
+- Analyze the traceback and diagnose the root cause (NameError, TypeError, SyntaxError, etc.).
+- Formulate a precise correction.
+- Write the complete file back and rerun tests to verify success.
+- Halt immediately when the test suite passes, or abort if the retry limit is exceeded.
+
+---
+
+## 🚀 Getting Started
+
+### 1. Installation
+
+Install Caretaker AI in editable mode:
 
 ```bash
-caretaker --test-command "pytest" --target-file "legacy_app/calculator.py"
+uv pip install -e .
 ```
 
-### Options
+### 2. Authentication
 
-*   `--test-command`: (Required) The exact command line string to run tests or build (e.g. `"npm test"` or `"pytest"`).
-*   `--target-file`: (Required) Path to the file containing the bug that needs to be repaired.
-*   `--project-id`: Google Cloud project ID (Vertex AI).
-*   `--location`: Google Cloud region for Vertex AI API (default: `us-central1`).
-*   `--model`: Gemini model name to use (default: `gemini-2.5-flash`).
-*   `--max-retries`: Maximum self-healing attempts to make before giving up (default: `3`).
+Authentication is managed via Google Cloud Application Default Credentials (ADC) or a custom Google Cloud Project. Ensure you are logged in:
+
+```bash
+gcloud auth application-default login
+```
+
+---
+
+## 💻 Usage
+
+### Command Line Interface (CLI)
+
+Run Caretaker AI on a failing target file:
+
+```bash
+caretaker --test-command "pytest legacy_app/test_calculator.py" --target-file "legacy_app/calculator.py" --max-retries 3
+```
+
+### Agent Playground & Google Agents CLI
+
+Since Caretaker AI is structured as an ADK Agent, it can be loaded directly into the Google Agent Playground or executed using `google-agents-cli`:
+
+```bash
+uvx google-agents-cli run "Repair legacy_app/calculator.py using pytest legacy_app/test_calculator.py"
+```
+
+---
+
+## 📂 Project Structure
+
+```
+caretaker-ai/
+├── caretaker_ai/
+│   ├── __init__.py    # Exports the ADK App
+│   ├── agent.py       # Core ADK Agent & Tool definitions
+│   ├── cli.py         # CLI wrapper around ADK runner
+│   ├── engine.py      # Legacy engine (for reference)
+│   ├── patcher.py     # Unified diff & file patching utilities
+│   └── runner.py      # CLI execution helper
+├── legacy_app/
+│   ├── calculator.py  # A buggy application file
+│   └── test_calculator.py
+└── pyproject.toml     # Project configuration & dependencies
+```
