@@ -119,5 +119,5 @@ Caretaker AI is designed to scale from a local CLI into a fully autonomous, cont
 3. **Heal:** Execute the self-healing loop locally until the generated reproduction test passes.
 4. **Verify & Deploy:** Commit the code modifications, push them to a temporary branch, and submit a Pull Request back to the main repository.
 
-The conceptual layout for this extension is outlined in [devops_agent.py](file:///c:/Users/danny/OneDrive/Desktop/my-first-project/caretaker-ai/caretaker_ai/devops_agent.py).
+The conceptual layout for this extension is outlined in [devops_agent.py]
 ```
