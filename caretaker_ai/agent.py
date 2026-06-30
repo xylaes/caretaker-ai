@@ -11,7 +11,7 @@ try:
     _, project_id = google.auth.default()
     os.environ["GOOGLE_CLOUD_PROJECT"] = project_id
 except Exception:
-    project_id = os.environ.get("GOOGLE_CLOUD_PROJECT", "gen-lang-client-0720914706")
+    project_id = os.environ.get("GOOGLE_CLOUD_PROJECT", "[placeholder]")
 
 os.environ["GOOGLE_CLOUD_LOCATION"] = "global"
 os.environ["GOOGLE_GENAI_USE_VERTEXAI"] = "True"
