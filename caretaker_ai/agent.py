@@ -65,7 +65,7 @@ def apply_patch(file_path: str, content: str) -> str:
         code_lines = []
         in_block = False
         for line in lines:
-            if line.strip().startswith("```"):
+            if "```" in line and line.lstrip().startswith("```"):
                 if not in_block:
                     in_block = True
                     continue
