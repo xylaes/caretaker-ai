@@ -4,7 +4,6 @@
 from google.adk.agents import Agent
 from google.adk.apps import App
 from google.adk.models import Gemini
-import os
 
 # Placeholder for GitHub API calls
 def fetch_github_issues(repo_name: str) -> list[dict]:
