@@ -18,5 +18,5 @@ class CommandRunner:
         )
         success = (result.returncode == 0)
         # Combine stdout and stderr if both exist, prioritizing stderr if it contains traces
-        output = result.stderr if result.stderr.strip() else result.stdout
+        output = result.stderr if result.stderr and not result.stderr.isspace() else result.stdout
         return success, output, result.returncode
