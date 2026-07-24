@@ -1,6 +1,5 @@
-import os
 import subprocess
-import sys
+import shlex
 
 class CommandRunner:
     def __init__(self, command: str, cwd: str = "."):
@@ -9,9 +8,10 @@ class CommandRunner:
 
     def run(self):
         """Runs the test command and returns (success, output, returncode)."""
+        cmd_args = shlex.split(self.command)
         result = subprocess.run(
-            self.command,
-            shell=True,
+            cmd_args,
+            shell=False,
             capture_output=True,
             text=True,
             cwd=self.cwd
