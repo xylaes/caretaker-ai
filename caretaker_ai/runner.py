@@ -1,5 +1,5 @@
-import subprocess
 import shlex
+import subprocess
 
 class CommandRunner:
     def __init__(self, command: str, cwd: str = "."):
