@@ -20,6 +20,8 @@ class TestCalculator(unittest.TestCase):
     def test_divide(self):
         self.assertEqual(self.calc.divide(6, 3), 2.0)
         self.assertEqual(self.calc.divide(5, 2), 2.5)
+        with self.assertRaises(ZeroDivisionError):
+            self.calc.divide(5, 0)
 
 if __name__ == '__main__':
     unittest.main()
