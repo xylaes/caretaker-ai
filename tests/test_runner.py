@@ -1,4 +1,3 @@
-import sys
 from caretaker_ai.runner import CommandRunner
 
 def test_command_runner_success():
