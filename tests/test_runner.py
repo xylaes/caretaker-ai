@@ -1,4 +1,3 @@
-import sys
 from caretaker_ai.runner import CommandRunner
 
 def test_command_runner_success():
@@ -16,3 +15,12 @@ def test_command_runner_failure():
     assert success is False
     assert "error_log" in output.strip()
     assert code == 42
+
+def test_command_runner_injection(tmp_path):
+    # Attempt a command injection that would create a file if shell=True was used
+    canary_file = tmp_path / "injected.txt"
+    command = f"python -c \"print('hello')\" ; touch {canary_file}"
+    runner = CommandRunner(command)
+    success, output, code = runner.run()
+    # If shell injection worked, canary_file would exist. It must NOT exist.
+    assert not canary_file.exists()
