@@ -9,5 +9,4 @@ class Calculator:
         return a * b
 
     def divide(self, a, b):
-        # Bug: typo B instead of b raises NameError
         return a / b
