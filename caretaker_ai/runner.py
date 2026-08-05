@@ -1,5 +1,7 @@
+import shlex
 import subprocess
 import shlex
+
 
 class CommandRunner:
     def __init__(self, command: str, cwd: str = "."):
@@ -10,13 +12,13 @@ class CommandRunner:
         """Runs the test command and returns (success, output, returncode)."""
         cmd_args = shlex.split(self.command)
         result = subprocess.run(
-            cmd_args,
-            shell=False,
-            capture_output=True,
-            text=True,
-            cwd=self.cwd
+            cmd_args, shell=False, capture_output=True, text=True, cwd=self.cwd
         )
-        success = (result.returncode == 0)
+        success = result.returncode == 0
         # Combine stdout and stderr if both exist, prioritizing stderr if it contains traces
-        output = result.stderr if result.stderr and not result.stderr.isspace() else result.stdout
+        output = (
+            result.stderr
+            if result.stderr and not result.stderr.isspace()
+            else result.stdout
+        )
         return success, output, result.returncode

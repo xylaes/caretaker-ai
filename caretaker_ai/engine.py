@@ -1,7 +1,24 @@
+import warnings
 from google import genai
 
+
 class GeminiHealer:
-    def __init__(self, project_id: str, location: str = "us-central1", model_name: str = "gemini-2.5-flash"):
+    """GeminiHealer is deprecated and will be removed in a future version.
+
+    This is a legacy engine kept for reference only. Please use caretaker_ai.agent instead.
+    """
+
+    def __init__(
+        self,
+        project_id: str,
+        location: str = "us-central1",
+        model_name: str = "gemini-2.5-flash",
+    ):
+        warnings.warn(
+            "GeminiHealer is deprecated and will be removed in a future version. Use caretaker_ai.agent instead.",
+            category=DeprecationWarning,
+            stacklevel=2,
+        )
         self.project_id = project_id
         self.location = location
         self.model_name = model_name
@@ -12,16 +29,14 @@ class GeminiHealer:
         if self._client is None:
             # We use Vertex AI backend powered by Active gcloud credentials
             self._client = genai.Client(
-                vertexai=True,
-                project=self.project_id,
-                location=self.location
+                vertexai=True, project=self.project_id, location=self.location
             )
         return self._client
 
     def generate_fix(self, file_path: str, file_content: str, error_logs: str) -> str:
         """Sends code and error logs to Gemini and returns the generated patch suggestions."""
         prompt = f"""You are an autonomous caretaker agent for legacy/EOL software.
-The application's test suite or build command has failed. Your goal is to patch the code in `{file_path}` to fix the bug and make the tests pass.
+The application\'s test suite or build command has failed. Your goal is to patch the code in `{file_path}` to fix the bug and make the tests pass.
 
 Here is the error/test failure output:
 ```
@@ -40,7 +55,6 @@ Rules:
 3. Do not include any explanations, introduction, markdown outside the code block, or other notes.
 """
         response = self.client.models.generate_content(
-            model=self.model_name,
-            contents=prompt
+            model=self.model_name, contents=prompt
         )
         return response.text
