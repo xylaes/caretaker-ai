@@ -45,7 +45,7 @@ def read_source_file(file_path: str) -> str:
         The content of the file.
     """
     if not os.path.exists(file_path):
-        return f"Error: File '{file_path}' does not exist."
+        return f"Error: File '{file_path}' does not exist!"
     with open(file_path, "r", encoding="utf-8") as f:
         return f.read()
 
