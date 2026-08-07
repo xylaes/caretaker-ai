@@ -100,7 +100,6 @@ caretaker-ai/
 │   ├── __init__.py    # Exports the ADK App
 │   ├── agent.py       # Core ADK Agent & Tool definitions
 │   ├── cli.py         # CLI wrapper around ADK runner
-│   ├── engine.py      # Legacy engine (for reference)
 │   ├── patcher.py     # Unified diff & file patching utilities
 │   └── runner.py      # CLI execution helper
 ├── legacy_app/

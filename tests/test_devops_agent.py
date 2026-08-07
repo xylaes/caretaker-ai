@@ -3,8 +3,9 @@ from caretaker_ai.devops_agent import (
     write_reproduction_test,
     deploy_code,
     devops_agent,
-    app
+    app,
 )
+
 
 def test_fetch_github_issues():
     # Call the fetch_github_issues function
@@ -17,6 +18,7 @@ def test_fetch_github_issues():
     assert issue["id"] == 101
     assert "Calculator divide" in issue["title"]
     assert "divide(5, 2)" in issue["description"]
+
 
 def test_write_reproduction_test(tmp_path):
     # Setup test file path using tmp_path (which is clean and safe)
@@ -35,8 +37,12 @@ def test_write_reproduction_test(tmp_path):
     assert "import pytest" in content
     assert "from legacy_app.calculator import Calculator" in content
     assert "test_reproduce_issue" in content
-    assert "Running calc.divide(5, 2) raises NameError: name 'b' is not defined." in content
+    assert (
+        "Running calc.divide(5, 2) raises NameError: name 'b' is not defined."
+        in content
+    )
     assert "assert calc.divide(6, 3) == 2.0" in content
+
 
 def test_deploy_code():
     repo = "xylaes/caretaker-ai"
@@ -51,6 +57,7 @@ def test_deploy_code():
     assert branch in result
     assert repo in result
 
+
 def test_devops_agent_config():
     # Verify devops_agent properties
     assert devops_agent.name == "devops_agent"
@@ -62,6 +69,7 @@ def test_devops_agent_config():
     assert "fetch_github_issues" in tool_names
     assert "write_reproduction_test" in tool_names
     assert "deploy_code" in tool_names
+
 
 def test_app_config():
     # Verify app properties

@@ -16,6 +16,7 @@ except Exception:
 os.environ["GOOGLE_CLOUD_LOCATION"] = "global"
 os.environ["GOOGLE_GENAI_USE_VERTEXAI"] = "True"
 
+
 def run_test_command(command: str) -> str:
     """Runs the specified test or build command on the application.
 
@@ -25,15 +26,11 @@ def run_test_command(command: str) -> str:
     Returns:
         The stderr or stdout log output of the command.
     """
-    result = subprocess.run(
-        command,
-        shell=True,
-        capture_output=True,
-        text=True
-    )
+    result = subprocess.run(command, shell=True, capture_output=True, text=True)
     output = result.stderr if result.stderr.strip() else result.stdout
     success = "PASSED" if result.returncode == 0 else "FAILED"
     return f"Status: {success}\nExit Code: {result.returncode}\nOutput:\n{output}"
+
 
 def read_source_file(file_path: str) -> str:
     """Reads the contents of the target source file to repair.
@@ -48,6 +45,7 @@ def read_source_file(file_path: str) -> str:
         return f"Error: File '{file_path}' does not exist!"
     with open(file_path, "r", encoding="utf-8") as f:
         return f.read()
+
 
 def apply_patch(file_path: str, content: str) -> str:
     """Overwrites the target source file with new, corrected content.
@@ -80,6 +78,7 @@ def apply_patch(file_path: str, content: str) -> str:
         f.write(content)
     return f"Successfully updated '{file_path}' with the new content."
 
+
 root_agent = Agent(
     name="caretaker_agent",
     model=Gemini(
@@ -106,7 +105,4 @@ Follow this execution loop:
     tools=[run_test_command, read_source_file, apply_patch],
 )
 
-app = App(
-    root_agent=root_agent,
-    name="caretaker-ai"
-)
+app = App(root_agent=root_agent, name="caretaker-ai")

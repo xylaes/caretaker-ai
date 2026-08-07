@@ -1,5 +1,6 @@
 import difflib
 
+
 class Patcher:
     @staticmethod
     def extract_code(response_text: str) -> str:
@@ -17,7 +18,7 @@ class Patcher:
                     break
             elif in_block:
                 code_lines.append(line)
-        
+
         if not code_lines:
             # Fallback if no block found
             return response_text.strip()
@@ -30,7 +31,7 @@ class Patcher:
             original.splitlines(keepends=True),
             corrected.splitlines(keepends=True),
             fromfile=f"a/{filename}",
-            tofile=f"b/{filename}"
+            tofile=f"b/{filename}",
         )
         return "".join(diff)
 
