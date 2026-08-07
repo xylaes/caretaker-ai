@@ -1,6 +1,7 @@
 import unittest
 from legacy_app.calculator import Calculator
 
+
 class TestCalculator(unittest.TestCase):
     def setUp(self):
         self.calc = Calculator()
@@ -23,5 +24,6 @@ class TestCalculator(unittest.TestCase):
         with self.assertRaises(ZeroDivisionError):
             self.calc.divide(5, 0)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

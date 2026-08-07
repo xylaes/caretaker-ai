@@ -1,5 +1,6 @@
 from caretaker_ai.patcher import Patcher
 
+
 def test_extract_code_with_markdown():
     response = """Here is the corrected code:
 ```python
@@ -11,10 +12,12 @@ Let me know if this works!"""
     expected = "def multiply(a, b):\n    return a * b"
     assert extracted.strip() == expected.strip()
 
+
 def test_extract_code_fallback():
     response = "def add(a, b):\n    return a + b"
     extracted = Patcher.extract_code(response)
     assert extracted == response
+
 
 def test_generate_diff():
     original = "def foo():\n    return 1"
@@ -22,6 +25,7 @@ def test_generate_diff():
     diff = Patcher.generate_diff(original, corrected, "foo.py")
     assert "-    return 1" in diff
     assert "+    return 2" in diff
+
 
 def test_apply_patch(tmp_path):
     # 1. Test writing new content to a non-existent file
