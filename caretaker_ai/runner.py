@@ -1,6 +1,5 @@
 import shlex
 import subprocess
-import shlex
 
 
 class CommandRunner:
