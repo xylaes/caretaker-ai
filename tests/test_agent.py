@@ -1,6 +1,5 @@
-import os
-import pytest
 from caretaker_ai.agent import read_source_file
+
 
 def test_read_source_file_success(tmp_path):
     # Setup test file with valid content, including unicode characters
@@ -11,6 +10,7 @@ def test_read_source_file_success(tmp_path):
     # Read the file and assert content match
     result = read_source_file(str(file_path))
     assert result == content
+
 
 def test_read_source_file_not_found(tmp_path):
     # Setup a non-existent file path
